@@ -51,18 +51,25 @@ try {
             break;
 
         case 'sistema':
-            $vectorB = parseMatrixText($textB);
-            // Se for enviado uma linha com números, extrai o vetor
-            $flatB = isset($vectorB[0]) ? $vectorB[0] : [];
+            $rawB = parseMatrixText($textB);
+            
+            // Converte tanto entrada em linha (5 10) quanto em coluna (5 \n 10) em array simples
+            $flatB = [];
+            foreach ($rawB as $row) {
+                foreach ($row as $val) {
+                    $flatB[] = $val;
+                }
+            }
+
             $x = $matrizA->solveLinearSystem($flatB);
             $resultado = [];
             foreach ($x as $index => $val) {
-                $resultado[] = ["x" . ($index + 1) => $val];
+                $resultado["x" . ($index + 1)] = $val;
             }
             break;
 
         default:
-            $erro = "Operação inválida.";
+            $erro = "Operação inválida selecionada.";
     }
 } catch (MatrixException $e) {
     $erro = $e->getMessage();
@@ -89,8 +96,8 @@ try {
             </div>
         <?php else: ?>
             <div class="card p-4 shadow-sm">
-                <h5>Saída:</h5>
-                <pre class="bg-dark text-light p-3 rounded"><?= htmlspecialchars(print_r($resultado, true)) ?></pre>
+                <h5 class="mb-3">Saída:</h5>
+                <pre class="bg-dark text-light p-3 rounded mb-0"><?= htmlspecialchars(print_r($resultado, true)) ?></pre>
             </div>
         <?php endif; ?>
 
