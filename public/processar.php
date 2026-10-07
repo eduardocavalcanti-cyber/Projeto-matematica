@@ -19,24 +19,34 @@ function parseMatrixText(string $text): array
 }
 
 $operacao = $_POST['operacao'] ?? '';
-$textA = $_POST['matrizA'] ?? '';
-$textB = $_POST['matrizB'] ?? '';
+$textA = trim($_POST['matrizA'] ?? '');
+$textB = trim($_POST['matrizB'] ?? '');
 
 $erro = null;
 $resultado = null;
 
 try {
+    if (empty($textA)) {
+        throw new MatrixException("A Matriz A não pode estar vazia.");
+    }
+
     $dataA = parseMatrixText($textA);
     $matrizA = new Matrix($dataA);
 
     switch ($operacao) {
         case 'somar':
+            if (empty($textB)) {
+                throw new MatrixException("A Matriz B é obrigatória para a operação de soma.");
+            }
             $dataB = parseMatrixText($textB);
             $matrizB = new Matrix($dataB);
             $resultado = $matrizA->add($matrizB)->getData();
             break;
 
         case 'multiplicar':
+            if (empty($textB)) {
+                throw new MatrixException("A Matriz B é obrigatória para a operação de multiplicação.");
+            }
             $dataB = parseMatrixText($textB);
             $matrizB = new Matrix($dataB);
             $resultado = $matrizA->multiply($matrizB)->getData();
@@ -51,9 +61,13 @@ try {
             break;
 
         case 'sistema':
+            if (empty($textB)) {
+                throw new MatrixException("O Vetor B (termos independentes) é obrigatório para o sistema linear.");
+            }
+            
             $rawB = parseMatrixText($textB);
             
-            // Converte tanto entrada em linha (5 10) quanto em coluna (5 \n 10) em array simples
+            // Aceita o vetor B digitado em linhas (5\n10) ou em uma só coluna (5 10)
             $flatB = [];
             foreach ($rawB as $row) {
                 foreach ($row as $val) {
@@ -88,7 +102,7 @@ try {
 </head>
 <body class="bg-light">
     <div class="container py-5">
-        <h2 class="mb-4">Resultado da Operação</h2>
+        <h2 class="mb-4 text-primary">Resultado da Operação</h2>
 
         <?php if ($erro): ?>
             <div class="alert alert-danger shadow-sm">
@@ -96,7 +110,7 @@ try {
             </div>
         <?php else: ?>
             <div class="card p-4 shadow-sm">
-                <h5 class="mb-3">Saída:</h5>
+                <h5 class="mb-3 text-secondary">Saída do Cálculo:</h5>
                 <pre class="bg-dark text-light p-3 rounded mb-0"><?= htmlspecialchars(print_r($resultado, true)) ?></pre>
             </div>
         <?php endif; ?>
