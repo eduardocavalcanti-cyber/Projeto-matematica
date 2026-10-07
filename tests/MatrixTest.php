@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests;
+namespace Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
 use App\Math\Matrix;
@@ -8,7 +8,6 @@ use App\Exceptions\MatrixException;
 
 class MatrixTest extends TestCase
 {
-    // --- CASOS FELIZES ---
 
     public function testSomaMatrizesValidas(): void
     {
@@ -51,8 +50,7 @@ class MatrixTest extends TestCase
 
     public function testSistemaLinearValido(): void
     {
-        // 2x + y = 5
-        // x + 3y = 10 -> Solução: x = 1, y = 3
+    
         $A = new Matrix([[2, 1], [1, 3]]);
         $B = [5, 10];
 
@@ -61,8 +59,6 @@ class MatrixTest extends TestCase
         $this->assertEqualsWithDelta(1.0, $solucao[0], 0.0001);
         $this->assertEqualsWithDelta(3.0, $solucao[1], 0.0001);
     }
-
-    // --- CASOS DE BORDA ---
 
     public function testMatriz1x1(): void
     {
@@ -91,7 +87,17 @@ class MatrixTest extends TestCase
         $this->assertEqualsWithDelta(0.0, $zero->determinant(), 0.0001);
     }
 
-    // --- CASOS DE ERRO ---
+    public function testErroMatrizVaziaOuInvalida(): void
+    {
+        $this->expectException(MatrixException::class);
+        new Matrix([]);
+    }
+
+    public function testErroMatrizLinhasDesiguais(): void
+    {
+        $this->expectException(MatrixException::class);
+        new Matrix([[1, 2], [3]]);
+    }
 
     public function testErroSomaDimensoesIncompativeis(): void
     {
@@ -109,10 +115,17 @@ class MatrixTest extends TestCase
         $m1->multiply($m2);
     }
 
+    public function testErroDeterminanteNaoQuadrada(): void
+    {
+        $this->expectException(MatrixException::class);
+        $m = new Matrix([[1, 2, 3], [4, 5, 6]]);
+        $m->determinant();
+    }
+
     public function testErroMatrizSingularSistemaLinear(): void
     {
         $this->expectException(MatrixException::class);
-        // Linhas proporcionais -> Determinate = 0
+        // Linhas proporcionais -> Determinante = 0
         $A = new Matrix([[1, 2], [2, 4]]);
         $B = [3, 6];
         $A->solveLinearSystem($B);
