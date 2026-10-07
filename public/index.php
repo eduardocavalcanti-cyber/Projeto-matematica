@@ -14,7 +14,7 @@
         <div class="card shadow-sm p-4 mb-4">
             <form action="processar.php" method="POST">
                 <div class="mb-3">
-                    <label for="operacao" class="form-label font-weight-bold">Selecione a Operação:</label>
+                    <label for="operacao" class="form-label fw-bold">Selecione a Operação:</label>
                     <select name="operacao" id="operacao" class="form-select" required>
                         <option value="somar">Soma de Matrizes (A + B)</option>
                         <option value="multiplicar">Multiplicação de Matrizes (A * B)</option>
@@ -26,13 +26,13 @@
 
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label for="matrizA" class="form-label">Matriz A (Separe números por espaço e linhas por quebra de linha):</label>
+                        <label for="matrizA" class="form-label fw-bold">Matriz A (Espaço separa colunas, Enter separa linhas):</label>
                         <textarea name="matrizA" id="matrizA" class="form-control" rows="5" placeholder="1 2&#10;3 4" required></textarea>
                     </div>
 
-                    <div class="col-md-6 mb-3">
-                        <label for="matrizB" class="form-label">Matriz B / Vetor B (Deixe vazio para Determinante ou Transposição):</label>
-                        <textarea name="matrizB" id="matrizB" class="form-control" rows="5" placeholder="5 6&#10;7 8 (ou 5 6 para vetor do sistema)"></textarea>
+                    <div class="col-md-6 mb-3" id="containerMatrizB">
+                        <label for="matrizB" id="labelMatrizB" class="form-label fw-bold">Matriz B / Vetor B:</label>
+                        <textarea name="matrizB" id="matrizB" class="form-control" rows="5" placeholder="5 6&#10;7 8"></textarea>
                     </div>
                 </div>
 
@@ -40,5 +40,34 @@
             </form>
         </div>
     </div>
+
+    <script>
+        const selectOperacao = document.getElementById('operacao');
+        const containerMatrizB = document.getElementById('containerMatrizB');
+        const labelMatrizB = document.getElementById('labelMatrizB');
+        const textareaB = document.getElementById('matrizB');
+
+        function atualizarInterface() {
+            const op = selectOperacao.value;
+            
+            if (op === 'transpor' || op === 'determinante') {
+                containerMatrizB.style.display = 'none';
+                textareaB.removeAttribute('required');
+            } else if (op === 'sistema') {
+                containerMatrizB.style.display = 'block';
+                labelMatrizB.textContent = 'Vetor B (Termos Independentes):';
+                textareaB.placeholder = "5\n10";
+                textareaB.setAttribute('required', 'required');
+            } else {
+                containerMatrizB.style.display = 'block';
+                labelMatrizB.textContent = 'Matriz B:';
+                textareaB.placeholder = "5 6\n7 8";
+                textareaB.setAttribute('required', 'required');
+            }
+        }
+
+        selectOperacao.addEventListener('change', atualizarInterface);
+        atualizarInterface();
+    </script>
 </body>
 </html>
